@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block title %}View Booking{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="page-header">
+                <h3 class="mb-2">Booking Detail</h3>
+                <div class="page-breadcrumb">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">Booking</li>
+                            <li class="breadcrumb-item active" aria-current="page">Booking Detail</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="/printBooking/{{result.b_id}}" class="btn btn-primary">Print</a>
+    <div class="card-body">
+        <div>
+            <h4>Booking Details</h4>
+            <p hidden>Booking ID: {{ result.b_id }}</p>
+            <p>Booking ID: {{ result.booking_id }}</p>
+            <p>Booking By: {{ result.booking_by }}</p>
+            <p>Booking Name: {{ result.booking_name }}</p>
+            <p>Booking Date: {{ result.booking_date }}</p>
+            <p>Game Date: 
+                {% for date in game_date %}
+                    {{ date['booking_start_time'] }}
+                {% endfor %}
+            </p>
+            <p>Game Time: {{ result.booking_start_time }} - {{ result.booking_end_time }}</p>
+        </div>
+        <br><br>
+        <div>
+            <h4>Court Details</h4>
+            <p>Court Name: {{ result.court_name }}</p>
+            <p>Booking Duration: {{ result.booking_duration }}</p>
+            <p>Total Booking Price: {{ 'RM %.2f'|format(result.booking_price) }}</p>
+        </div>
+    </div>
+{% endblock %}

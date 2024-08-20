@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <link rel="stylesheet" href="../static/assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link href="../static/assets/vendor/fonts/circular-std/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="../static/assets/libs/css/style.css">
+  <link rel="stylesheet" href="../static/assets/vendor/fonts/fontawesome/css/fontawesome-all.css">
+  <link rel="stylesheet" href="../static/assets/vendor/charts/chartist-bundle/chartist.css">
+  <link rel="stylesheet" href="../static/assets/vendor/charts/morris-bundle/morris.css">
+  <link rel="stylesheet" href="../static/assets/vendor/fonts/material-design-iconic-font/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="../static/assets/vendor/charts/c3charts/c3.css">
+  <link rel="stylesheet" href="../static/assets/vendor/fonts/flag-icon-css/flag-icon.min.css">
+  <link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+  crossorigin="anonymous"/>
+  <link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+  crossorigin="anonymous"/>
+  
+  <style>
+    body {
+      background-color: #ccc;
+    }
+    .main {
+      width: 300px;
+      margin: 100px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .main-login {
+      margin-top: 50px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-control {
+      width: 100%;
+    }
+    .btn-login {
+      width: 100%;
+    }
+    .btn-login + p {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row justify-content-md-center">
+      <div class="col-md-6 main">
+        <h5 class="text-center mb-4">Please enter your username and password to login</h5>
+        <form action="{{ url_for('login') }}" method="post" autocomplete="off">
+
+          <div class="form-group">
+            <label for="admin_username">Username</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+              <input type="text" class="form-control" name="admin_username" id="admin_username" placeholder="Enter your Username" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="admin_password">Password</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+              <input type="password" class="form-control" name="admin_password" id="admin_password" placeholder="Password" required>
+              <span class="input-group-addon toggle-password"><i class="fa fa-eye-slash" aria-hidden="true"></i></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            <input type="submit" value="Login" class="form-control btn btn-success" name=""/>
+          </div>
+        </form>
+          <p>No account <a href="{{ url_for('register') }}">Register</a></p>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script>
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(function(icon) {
+        icon.addEventListener('click', function() {
+            const input = icon.previousElementSibling;
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            icon.querySelector('i').classList.toggle('fa-eye');
+            icon.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    });
+  </script>
+</body>
+</html>

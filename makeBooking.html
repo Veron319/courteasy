@@ -1,0 +1,191 @@
+{% extends 'layout.html' %}
+
+{% block title %}Make Booking{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="../static/dateTimePicker/jquery.datetimepicker.min.css">
+    <script src="../static/dateTimePicker/jquery.js"></script>
+    <script src="../static/dateTimePicker/jquery.datetimepicker.full.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        input[readonly] {
+            background-color: white !important;
+        }
+    </style>
+
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="page-header">
+                <h3 class="mb-2">Make Booking</h3>
+                <div class="page-breadcrumb">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">Make Booking</li>
+                            <li class="breadcrumb-item active" aria-current="page">Make Booking</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h3>Booking Form</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('makeBooking') }}" method="POST" id="bookingForm"> 
+                    <input type="text" class="form-control" id="booking_by" name="booking_by" value="{{ account['admin_id'] }}" hidden>
+                    
+                    <div class="form-group">
+                        <label for="booking_name">Name</label>
+                        <input type="text" class="form-control" id="booking_name" name="booking_name" placeholder="Name" value="{{ account['admin_username'] }}" required>
+                    </div>
+            
+                    <div class="form-group">
+                        <label for="booking_start_time">Date and Time</label>
+                        <input class="form-control" id="datetime" name="booking_start_time" required readonly>
+                        <small class="form-text text-muted">The latest booking time is 10:30 PM</small>
+                    </div> 
+                
+                    <div class="form-group">
+                        <label for="booking_duration">Duration (in minutes)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="booking_duration" name="booking_duration" placeholder="Duration" aria-describedby="inputGroupPrepend" min="60" step="30" required>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" type="submit">Find Available Courts</button>     
+                    <button class="btn btn-secondary" type="button" id="randomCourtBtn">Random Court</button>          
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('randomCourtBtn').addEventListener('click', function() {
+            // Get the values of name, date, and duration fields
+            var name = document.getElementById('booking_name').value.trim();
+            var datetime = document.getElementById('datetime').value.trim();
+            var duration = document.getElementById('booking_duration').value.trim();
+    
+            // Check if name, datetime, and duration are not empty
+            if (name !== '' && datetime !== '' && duration !== '') {
+                // Change form action
+                document.getElementById('bookingForm').action = "{{ url_for('randomCourtBooking') }}";
+                // Submit the form
+                document.getElementById('bookingForm').submit();
+            } else {
+                // Alert the user to fill in all required fields
+                alert('Please fill in all required fields (Name, Date and Time, Duration) before selecting a random court.');
+            }
+        });
+    
+        $("#datetime").datetimepicker({
+            step: 30, // Set the time step to 30 minutes
+            minDate: new Date(), // Set minimum date to current date
+            minTime: '08:00',
+            maxTime: '23:30',
+            formatTime: 'H:i',
+            onSelectTime: function (currentTime, input) {
+                var selectedTime = new Date(currentTime);
+                var currentTime = new Date();
+    
+                if (selectedTime < currentTime) {
+                    alert("Please select a time equal to or after the current time.");
+                    input.clear();
+                }
+            }
+        });
+    
+        $('form').submit(function(event) {
+            var selectedTime = new Date($('#datetime').val());
+            var currentTime = new Date();
+    
+            if (selectedTime < currentTime) {
+                alert("Please select a time equal to or after the current time.");
+                event.preventDefault(); // Prevent the form from submitting
+            }
+        });
+    
+        // Validate manually entered time
+        document.getElementById('datetime').addEventListener('input', function () {
+            var inputTime = this.value;
+            var timePattern = /^(\d{2}):([03]0)$/; // Pattern to match HH:00 or HH:30
+    
+            if (!timePattern.test(inputTime)) {
+                this.setCustomValidity('Please enter a valid time in 30-minute increments (e.g., 12:00, 12:30).');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    
+        // Validate duration
+        var bookingDurationInput = document.getElementById('booking_duration');
+        bookingDurationInput.addEventListener('input', function () {
+            var duration = parseInt(bookingDurationInput.value);
+    
+            // Check if the duration is less than 60
+            if (duration < 60) {
+                bookingDurationInput.setCustomValidity('Duration should be at least 60 minutes (1 hour).');
+                return;
+            }
+    
+            // Check if the duration's minutes are in multiples of 30
+            var minutes = duration % 60;
+            if (minutes !== 0 && minutes !== 30) {
+                bookingDurationInput.setCustomValidity('Minutes should be in multiples of 30.');
+                return;
+            }
+    
+            bookingDurationInput.setCustomValidity('');
+        });
+    
+        // Function to calculate end time based on start time and duration
+        function calculateEndTime() {
+            var bookingStartTimeInput = document.getElementById('datetime');
+            var bookingDurationInput = document.getElementById('booking_duration');
+            var endTimeOutput = document.getElementById('end_time');
+    
+            var startTime = new Date(bookingStartTimeInput.value);
+            var duration = parseInt(bookingDurationInput.value);
+    
+            // Calculate end time
+            var endTime = new Date(startTime.getTime() + duration * 60000); // Convert minutes to milliseconds
+    
+            // If end time is after midnight (00:01:00), show validation error
+            if (endTime.getDate() !== startTime.getDate() || (endTime.getHours() === 0 && endTime.getMinutes() > 1)) {
+                bookingDurationInput.setCustomValidity('End time cannot be after midnight.');
+            } else {
+                bookingDurationInput.setCustomValidity('');
+            }
+    
+            // Format end time as string
+            var endHour = ('0' + endTime.getHours()).slice(-2);
+            var endMinute = ('0' + endTime.getMinutes()).slice(-2);
+            var endTimeString = endHour + ':' + endMinute;
+    
+            // Update end time in HTML
+            endTimeOutput.innerHTML = '<strong>End Time:</strong> ' + endTimeString;
+        }
+    
+        // Event listeners for changes in start time and duration inputs
+        document.getElementById('datetime').addEventListener('change', calculateEndTime);
+        document.getElementById('booking_duration').addEventListener('input', calculateEndTime);
+    </script>    
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Court Chart
+{% endblock %}
+
+{% block content %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Court Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-piechart-outlabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="page-header">
+                <h3 class="mb-2">Court Chart</h3>
+                <div class="page-breadcrumb">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Chart</li>
+                    <li class="breadcrumb-item active" aria-current="page">Court Chart</li>
+                    </ol>
+                    <br>
+                </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row float-right">
+        <div class="float-right">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <form id="timeframeForm" action="/courtChart" method="GET">
+                    <select id="timeframeSelect" name="timeframe" onchange="this.form.submit()">
+                        <option value="default" {% if timeframe == 'default' %}selected{% endif %}>Default</option>
+                        <option value="jan" {% if timeframe == 'jan' %}selected{% endif %}>January</option>
+                        <option value="feb" {% if timeframe == 'feb' %}selected{% endif %}>February</option>
+                        <option value="mar" {% if timeframe == 'mar' %}selected{% endif %}>March</option>
+                        <option value="apr" {% if timeframe == 'apr' %}selected{% endif %}>April</option>
+                        <option value="may" {% if timeframe == 'may' %}selected{% endif %}>May</option>
+                        <option value="jun" {% if timeframe == 'jun' %}selected{% endif %}>June</option>
+                        <option value="jul" {% if timeframe == 'jul' %}selected{% endif %}>July</option>
+                        <option value="aug" {% if timeframe == 'aug' %}selected{% endif %}>August</option>
+                        <option value="sep" {% if timeframe == 'sep' %}selected{% endif %}>September</option>
+                        <option value="oct" {% if timeframe == 'oct' %}selected{% endif %}>October</option>
+                        <option value="nov" {% if timeframe == 'nov' %}selected{% endif %}>November</option>
+                        <option value="dec" {% if timeframe == 'dec' %}selected{% endif %}>December</option>
+                    </select>                    
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="mb-2">Court Usage</h4>
+                <hr>
+            </div>
+        </div>
+      
+        <!-- Court Usage Chart -->
+        <div class="row">
+          <div class="col-md-6">
+            <canvas id="numBooking" width="400" height="300"></canvas>
+          </div>
+        </div>
+      
+        <!-- Top 5 Percentage Of Court Usage -->
+        <div class="row mt-4">
+          <div class="col-md-12">
+            <h5>Top 5 Percentage Of Court Usage In Every Booking (Total have {{ total_bookings }} bookings):</h5>
+            {% if usageCourtCount %}
+                {% set sortedUsageCourtCounts = usageCourtCount|sort(attribute='count', reverse=true) %}
+                <ul>
+                    {% for usageCourtCounts in sortedUsageCourtCounts[:5] %}
+                        <li>
+                            {{ usageCourtCounts['court_name'] }}: 
+                            {% set court_index = court_names.index(usageCourtCounts['court_name']) %}
+                            {{ percentages[court_index]|round(2) }}% ({{ usageCourtCounts['count'] }} bookings).
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No Bookings</p>
+            {% endif %}
+          </div>
+        </div>
+      
+        <div class="row">
+          <div class="col-md-12">
+            <h4 class="mb-2 mt-5">Booking Start Time</h4>
+            <hr>
+          </div>
+        </div>
+      
+        <!-- Booking Start Time Chart -->
+        <div class="row">
+          <div class="col-md-6">
+            <canvas id="bookingStartChart" width="400" height="200"></canvas>
+          </div>
+        </div>
+      
+        <!-- Off Peak Hour and Peak Hour -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h5>Off Peak Hour and Peak Hour by Booking Counts: (Total have {{ total_bookings }} bookings)</h5>
+                {% if num_bookings and time_intervals %}
+                <ul>
+                    {% set max_booking = num_bookings|max %}
+                    {% set min_booking = num_bookings|min %}
+                    
+                    {% for i in range(time_intervals|length) %}
+                        {% if num_bookings[i] == max_booking %}
+                            <li>
+                                Peak Hour - There are about {{ num_bookings[i] }} games starting at {{ time_intervals[i] }} o'clock.
+                            </li>
+                        {% elif num_bookings[i] == min_booking %}
+                            <li>
+                                Off Peak Hour - There are about {{ num_bookings[i] }} games starting at {{ time_intervals[i] }} o'clock.
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No Bookings</p>
+            {% endif %}
+            </div>
+        </div>
+    </div>      
+
+    <script>
+        var courtIDs = {{ court_names | tojson | safe }};
+        var counts = {{ counts | tojson | safe }};
+
+        // Combine court IDs and counts into an array of objects
+        var data = courtIDs.map((id, index) => ({ id: id, count: counts[index] }));
+
+        // Sort the data array based on court IDs in ascending order
+        data.sort((a, b) => a.id.localeCompare(b.id));
+
+        // Extract sorted court IDs and counts from the sorted data array
+        var sortedCourtIDs = data.map(item => item.id);
+        var sortedCounts = data.map(item => item.count);
+
+        var ctx = document.getElementById('numBooking').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: sortedCourtIDs,
+                datasets: [{
+                    label: 'Number of Bookings per Court',
+                    data: sortedCounts,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Number of Bookings'
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1 // Ensures only integer values are displayed on the y-axis
+                        }
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Court ID'
+                        }
+                    }]
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            var dataset = data.datasets[tooltipItem.datasetIndex];
+                            var value = dataset.data[tooltipItem.index];
+                            return "Number of Bookings: " + value + " bookings";
+                        }
+                    }
+                }
+            }
+        });
+
+        // Booking Start Chart
+        var timeIntervals = {{ time_intervals | tojson }};
+        var numBookings = {{ num_bookings | tojson }};
+
+        var ctx = document.getElementById('bookingStartChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: timeIntervals,
+                datasets: [{
+                    label: 'Total Bookings',
+                    data: numBookings,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Total Bookings'
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1 // Ensures only integer values are displayed on the y-axis
+                        }
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Hour'
+                        }
+                    }]
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            var value = tooltipItem.yLabel;
+                            return "Total Bookings: " + value + " bookings";
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+  
+{% block title %}Profile{% endblock %}
+  
+{% block content %}
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="page-header">
+                <h3 class="mb-2">Profile Page</h3>
+                <div class="page-breadcrumb">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">Profile</li>
+                            <li class="breadcrumb-item active" aria-current="page">Profile Page</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+        {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div style="margin-top: 20px;">
+        <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Your account details are below:</p>
+        <table class="table table-striped">
+            <tr>
+                <td style="font-weight: bold;">Admin ID:</td>
+                <td>{{ account['admin_id'] }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Username:</td>
+                <td>{{ account['admin_username'] }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Email:</td>
+                <td>{{ decrypted_email }}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold;">Phone Number:</td>
+                <td>{{ decrypted_number }}</td>
+            </tr>
+
+            <tr>
+                <td style="font-weight: bold;">Last Login:</td>
+                <td>{{ account['admin_last_login'] }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('editProfile') }}" class="btn btn-primary">Edit Profile</a>
+    </div>
+    
+    <div style="margin-top: 10px;">
+        <a href="{{ url_for('changePassword') }}" class="btn btn-primary">Change Password</a>
+    </div>
+    
+{% endblock %}

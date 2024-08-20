@@ -1,0 +1,71 @@
+{% extends 'layout.html' %}
+
+{% block title %}Live Court{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="page-header">
+      <h3 class="mb-2">Live Court</h3>
+      <div class="page-breadcrumb">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">Court</li>
+            <li class="breadcrumb-item active" aria-current="page">Live Court</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Court ID</th>
+            <th>Court Name</th>
+            <th>Court Start Time</th>
+            <th>Court End Time</th>
+            <th>Duration</th>
+            <th>Live Court Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for court_row in data|sort(attribute='court_name') %}
+          <tr>
+            <td>{{ court_row.court_id }}</td>
+            <td>{{ court_row.court_name }}</td>
+            <td>
+              {% for booking_row in time %}
+              {% if booking_row.c_id == court_row.c_id %}
+              {{ booking_row.booking_start_time }}
+              {% endif %}
+              {% endfor %}
+            </td>
+            <td>
+              {% for booking_row in time %}
+              {% if booking_row.c_id == court_row.c_id %}
+              {{ booking_row.booking_end_time }}
+              {% endif %}
+              {% endfor %}
+            </td>
+            <td>
+              {% for booking_row in time %}
+              {% if booking_row.c_id == court_row.c_id %}
+              {{ booking_row.booking_duration }}
+              {% endif %}
+              {% endfor %}
+            </td>
+            <td>{{ court_row.court_livestatus }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

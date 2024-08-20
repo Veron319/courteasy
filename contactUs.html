@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+  
+{% block title %}About & Contact Us{% endblock %}
+  
+{% block content %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="page-header">
+            <h3 class="mb-2">About & Contact Us</h3>
+            <div class="page-breadcrumb">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">About</li>
+                        <li class="breadcrumb-item active" aria-current="page">About & Contact Us</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div style="margin-top: 20px;">
+    <h4>About Us</h4>
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Who We Are</p>
+    <p>We are a leading company in the industry, dedicated to providing the best services and products to our customers. Our team of professionals is committed to excellence and innovation.</p>
+
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Our Mission</p>
+    <p>Our mission is to deliver high-quality solutions that add value to our clients' businesses and improve their lives. We strive to be at the forefront of technology and customer service.</p>
+
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Our Vision</p>
+    <p>We envision a world where our services and products empower individuals and organizations to achieve their fullest potential. We aim to be recognized as a trusted and innovative leader in our industry.</p>
+</div>
+
+<div style="margin-top: 20px;">
+    <h4>Contact Us</h4>
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Get in Touch</p>
+    <p>If you have any questions or need further information, please feel free to contact us. We are here to help!</p>
+</div>
+
+<div style="margin-top: 20px;">
+    <form method="post" action="{{ url_for('about') }}">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="message">Message</label>
+            <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send Message</button>
+    </form>
+</div>
+{% endblock %}

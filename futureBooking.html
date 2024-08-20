@@ -1,0 +1,93 @@
+{% extends 'layout.html' %}
+
+{% block title %}Future Booking{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="page-header">
+                <h3 class="mb-2">Future Booking</h3>
+                <div class="page-breadcrumb">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Booking</li>
+                        <li class="breadcrumb-item active" aria-current="page">Future Booking</li>
+                    </ol>
+                    <br>
+                    <span class="breadcrumb-item active">These booking is the status that show Future Bookings.</span>
+                </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="table" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">Booking ID</th>
+                                <th scope="col">Booking Name</th>
+                                <th scope="col">Booking Date</th>
+                                <th scope="col">Booking Start Time</th>
+                                <th scope="col">Booking End Time</th>
+                                <th scope="col">Booking Duration</th>
+                                <th scope="col">Booking Price</th>
+                                <th scope="col">Booking Status</th>
+                                <th scope="col">Court Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data %}
+                                <tr>
+                                    <td>{{ row[10] }}</td>
+                                    <td>{{ row[1] }}</td>
+                                    <td>{{ row[2] }}</td>
+                                    <td>{{ row[3] }}</td>
+                                    <td>{{ row[4] }}</td>
+                                    <td>{{ row[5] }}</td>
+                                    <td>{{ 'RM %.2f'|format(row[6]) }}</td>
+                                    <td>{{ row[7] }}</td>
+                                    <td>
+                                        {% for courts in court %}
+                                            {% if courts.c_id == row.c_id %}
+                                                {{ courts.court_name }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            {% if row[7] == 'Completed' or row[7] == 'Ongoing' %}
+                                                <a href="/viewBooking/{{row.0}}" class="btn btn-info btn-sm">View</a>
+                                            {% else %}
+                                                <a href="/editBookingPage/{{row.0}}" class="btn btn-warning btn-sm">Edit</a>
+                                                <a href="/deleteBooking/{{row.0}}" onclick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-sm">Delete</a>
+                                                <a href="/viewBooking/{{row.0}}" class="btn btn-info btn-sm">View</a>
+                                            {% endif %}
+                                        </div>
+                                    </td>                                    
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'layout.html' %}
+
+{% block title %}Edit Booking{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="../static/dateTimePicker/jquery.datetimepicker.min.css">
+    <script src="../static/dateTimePicker/jquery.js"></script>
+    <script src="../static/dateTimePicker/jquery.datetimepicker.full.js"></script>
+    
+    <style>
+        input[readonly] {
+            background-color: white !important;
+        }
+    </style>
+
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="page-header">
+                <h3 class="mb-2">Edit Booking</h3>
+                <div class="page-breadcrumb">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">Booking</li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Booking</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card-body">
+        <form action="{{ url_for('editBookingCourtPage') }}" method="POST" id="bookingForm">
+                {% if booking %}
+                    <input name="b_id" value="{{booking.0}}" hidden>
+
+                    <input class="form-control" id="booking_by" name="booking_by"value="{{ booking.1 }}" hidden>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="booking_name">Name</label>
+                    {% if booking %}
+                    <input type="text" class="form-control" id="booking_name" name="booking_name" value="{{ booking.2 }}" required/>
+                    {% endif %}
+                </div>   
+
+                <div class="form-group">
+                    <label for="booking_start_time">Date and Time</label>
+                    {% if booking_start_time %}
+                    <input class="form-control" id="datetime" name="booking_start_time" value="{{ booking_start_time }}" required readonly>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="booking_duration">Duration (in minutes)</label>
+                    <div class="input-group">
+                        {% if booking %}
+                        <input type="number" class="form-control" id="booking_duration" name="booking_duration" value="{{ booking.6 }}" aria-describedby="inputGroupPrepend" min="60" step="30" required>
+                        {% endif %}
+                    </div>
+                </div>
+            <button class="btn btn-primary" type="submit">Update</button>        
+        </form>
+    </div>
+
+    <script>
+        $("#datetime").datetimepicker({
+            step: 30,
+            minDate: new Date(), // Set minimum date to current date
+            minTime: '08:00',
+            maxTime: '23:30',
+            onSelectTime: function (currentTime, input) {
+                var selectedTime = new Date(currentTime);
+                var currentTime = new Date();
+                
+                if (selectedTime < currentTime) {
+                    alert("Please select a time equal to or after the current time.");
+                    // You can clear the input or handle the situation as per your requirements
+                    input.clear(); // Clear the selected time
+                }
+            }
+        });
+
+        $('form').submit(function(event) {
+            var selectedTime = new Date($('#datetime').val());
+            var currentTime = new Date();
+            
+            if (selectedTime < currentTime) {
+                alert("Please select a time equal to or after the current time.");
+                event.preventDefault(); // Prevent the form from submitting
+            }
+        });
+
+        // Validate duration
+        var bookingDurationInput = document.getElementById('booking_duration');
+        bookingDurationInput.addEventListener('input', function () {
+            var duration = parseInt(bookingDurationInput.value);
+    
+            // Check if the duration is less than 60
+            if (duration < 60) {
+                bookingDurationInput.setCustomValidity('Duration should be at least 60 minutes (1 hour).');
+                return;
+            }
+    
+            // Check if the duration's minutes are in multiples of 30
+            var minutes = duration % 60;
+            if (minutes !== 0 && minutes !== 30) {
+                bookingDurationInput.setCustomValidity('Minutes should be in multiples of 30.');
+                return;
+            }
+    
+            bookingDurationInput.setCustomValidity('');
+        });
+
+        // Function to calculate end time based on start time and duration
+        function calculateEndTime() {
+            var bookingStartTimeInput = document.getElementById('datetime');
+            var bookingDurationInput = document.getElementById('booking_duration');
+            var endTimeOutput = document.getElementById('end_time');
+
+            var startTime = new Date(bookingStartTimeInput.value);
+            var duration = parseInt(bookingDurationInput.value);
+
+            // Calculate end time
+            var endTime = new Date(startTime.getTime() + duration * 60000); // Convert minutes to milliseconds
+
+            // If end time is after midnight (00:01:00), show validation error
+            if (endTime.getDate() !== startTime.getDate() || (endTime.getHours() === 0 && endTime.getMinutes() > 1)) {
+                bookingDurationInput.setCustomValidity('End time cannot be after midnight.');
+            } else {
+                bookingDurationInput.setCustomValidity('');
+            }
+
+            // Format end time as string
+            var endHour = ('0' + endTime.getHours()).slice(-2);
+            var endMinute = ('0' + endTime.getMinutes()).slice(-2);
+            var endTimeString = endHour + ':' + endMinute;
+
+            // Update end time in HTML
+            endTimeOutput.innerHTML = '<strong>End Time:</strong> ' + endTimeString;
+        }
+
+        // Event listeners for changes in start time and duration inputs
+        document.getElementById('datetime').addEventListener('change', calculateEndTime);
+        document.getElementById('booking_duration').addEventListener('input', calculateEndTime);
+    </script>  
+{% endblock %}

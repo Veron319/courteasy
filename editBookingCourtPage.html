@@ -1,0 +1,111 @@
+{% extends 'layout.html' %}
+
+{% block title %}Edit Booking{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="page-header">
+                <h3 class="mb-2">Edit Booking</h3>
+                <div class="page-breadcrumb">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">Booking</li>
+                            <li class="breadcrumb-item active" aria-current="page">Edit Booking</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card-body">
+        <form action="{{ url_for('editBooking') }}" method="POST" id="bookingForm">
+                <input name="b_id" value="{{ b_id }}" hidden>
+                <input type="text" class="form-control" id="booking_by" name="booking_by" value="{{ booking_by }}" hidden>
+                <input type="text" class="form-control" id="booking_name" name="booking_name" value="{{ booking_name }}" hidden/>
+                <input class="form-control" id="datetime" name="booking_start_time" value="{{ booking_start_time }}" hidden>
+                <input type="number" class="form-control" id="booking_duration" name="booking_duration" value="{{ booking_duration }}" placeholder="Duration" aria-describedby="inputGroupPrepend" min="60" hidden/>
+
+                <div class="form-row">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mb-2">
+                        <label for="court">Court Layout</label>
+                        <img src="{{ url_for('latest_image') }}" alt="Layout" class="img-fluid rounded">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="court">Court:</label>
+                    <select class="form-control" id="court" name="booking_court">
+                        {% for row in court %}    
+                            <option value="{{ row.c_id }}" data-price="{{ row.court_price }}"
+                                {% if booking and booking.8 == row.c_id %} selected {% endif %}>
+                                {{ row.court_name }}
+                            </option>
+                        {% endfor %}    
+                    </select>
+                </div>
+                
+            <div class="form-group">
+                <p id="price-display"></p>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Update</button>        
+        </form>
+    </div>
+
+    <script>
+        // Get reference to the court selection dropdown
+        var courtSelect = document.getElementById('court');
+    
+        // Function to update the price based on the selected court
+        function updatePrice() {
+            // Get the selected option
+            var selectedOption = courtSelect.options[courtSelect.selectedIndex];
+    
+            // Get the price associated with the selected court
+            var price = selectedOption.getAttribute('data-price');
+    
+            // Update the price display element
+            var priceDisplay = document.getElementById('price-display');
+            priceDisplay.textContent = 'Price: ' + price;
+        }
+    
+        // Add event listener to the court selection dropdown
+        courtSelect.addEventListener('change', updatePrice);
+    
+        // Validate duration
+        var bookingDurationInput = document.getElementById('booking_duration');
+        bookingDurationInput.addEventListener('input', function () {
+            var duration = parseInt(bookingDurationInput.value);
+    
+            // Check if the duration is less than 60
+            if (duration < 60) {
+                bookingDurationInput.setCustomValidity('Duration should be at least 60 minutes (1 hour).');
+                return;
+            }
+    
+            // Check if the duration's minutes are in multiples of 30
+            var minutes = duration % 60;
+            if (minutes !== 0 && minutes !== 30) {
+                bookingDurationInput.setCustomValidity('Minutes should be in multiples of 30.');
+                return;
+            }
+    
+            bookingDurationInput.setCustomValidity('');
+        });
+    </script>    
+{% endblock %}

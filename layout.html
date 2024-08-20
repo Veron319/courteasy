@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        
+        <link rel="stylesheet" href="../static/assets/vendor/bootstrap/css/bootstrap.min.css">
+        <link href="../static/assets/vendor/fonts/circular-std/style.css" rel="stylesheet">
+        <link rel="stylesheet" href="../static/assets/libs/css/style.css">
+        <link rel="stylesheet" href="../static/assets/vendor/fonts/fontawesome/css/fontawesome-all.css">
+        <link rel="stylesheet" href="../static/assets/vendor/charts/chartist-bundle/chartist.css">
+        <link rel="stylesheet" href="../static/assets/vendor/charts/morris-bundle/morris.css">
+        <link rel="stylesheet" href="../static/assets/vendor/fonts/material-design-iconic-font/css/materialdesignicons.min.css">
+        <link rel="stylesheet" href="../static/assets/vendor/charts/c3charts/c3.css">
+        <link rel="stylesheet" href="../static/assets/vendor/fonts/flag-icon-css/flag-icon.min.css">
+        <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous"/>
+        <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        crossorigin="anonymous"/>
+
+        <title>{% block title %} Home {% endblock %}</title>
+        
+        <style>
+            th{
+                font-family: 'Circular Std Book', sans-serif !important;
+                font-style: normal !important;
+                font-weight: normal !important;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <!--Main div-->>
+        <div class="dashboard-main-wrapper">
+            <!--Header-->
+            <div class="dashboard-header">
+                <nav class="navbar navbar-expand-lg bg-white fixed-top">
+                    <a class="navbar-brand" href="{{ url_for('home') }}">CourtEasy</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse " id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto navbar-right-top">
+                            <li class="nav-item">
+                                <div id="custom-search" class="top-search-bar">
+                                    <p>Good day, {{admin_username}}</p>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown nav-user">
+                                <a class="nav-link nav-user-img" href="#" id="navbarDropdownMenuLink2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user mr-2"></i></a>
+                                <div class="dropdown-menu dropdown-menu-right nav-user-dropdown" aria-labelledby="navbarDropdownMenuLink2">
+                                    <a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user mr-2"></i>Account</a>
+                                    <a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-power-off mr-2"></i>Logout</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+            <!--Sidebar-->
+            <div class="nav-left-sidebar sidebar-dark">
+                <div class="menu-list">
+                    <nav class="navbar navbar-expand-lg navbar-light">
+                        <a class="d-xl-none d-lg-none" href="#">Dashboard</a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav flex-column">
+            
+                                <a class="nav-link active"></i>Dashboard</a>
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-toggle="collapse" aria-expanded="false" data-target="#submenu-2" aria-controls="submenu-2"><i class="fa fa-fw fa-rocket"> </i>Create Booking</a>
+                                    <div id="submenu-2" class="collapse submenu">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('makeBooking') }}">Booking (Walk In)</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('linkAccBookingMake') }}">Booking (Walk In With Account)</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-toggle="collapse" aria-expanded="false" data-target="#submenu-3" aria-controls="submenu-3"><i class="fa fa-fw fa-rocket"> </i>View Booking</a>
+                                    <div id="submenu-3" class="collapse submenu">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('booking') }}">Booking History</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('rencentBooking') }}">Recent Booking</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-toggle="collapse" aria-expanded="false" data-target="#submenu-4" aria-controls="submenu-4"><i class="fas fa-fw fa-chart-pie"></i>Court</a>
+                                    <div id="submenu-4" class="collapse submenu">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('court')}}">Court List</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('courtLayout')}}">Court Layout</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('liveCourt')}}">Live Court</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="nav-item ">
+                                    <a class="nav-link" href="#" data-toggle="collapse" aria-expanded="false" data-target="#submenu-5" aria-controls="submenu-5"><i class="fab fa-fw fa-wpforms"></i>Chart</a>
+                                    <div id="submenu-5" class="collapse submenu">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('saleChart')}}">Sale Chart</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('courtChart')}}">Court Chart</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-toggle="collapse" aria-expanded="false" data-target="#submenu-6" aria-controls="submenu-6"><i class="fas fa-fw fa-table"></i>Report</a>
+                                    <div id="submenu-6" class="collapse submenu">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('salesReport')}}">Sales Report</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url_for('dailyCourtRentalsReport')}}">Court Rentals Report</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="dashboard-wrapper">
+                <div class="dashboard-ecommerce">
+                    <div class="container-fluid dashboard-content ">
+                        {% block content %} {% endblock %}
+                    </div>
+                </div>
+
+                <!--Footer-->
+                <div class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                Copyright © 2024 CourtEasy. All rights reserved.
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+                                <div class="text-md-right footer-links d-none d-sm-block">
+                                    <a href="{{ url_for('about')}}">About</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Optional JavaScript -->
+        <!-- jquery 3.3.1 -->
+        <script src="../static/assets/vendor/jquery/jquery-3.3.1.min.js"></script>
+        <!-- bootstap bundle js -->
+        <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.js"></script>
+        <!-- slimscroll js -->
+        <script src="../static/assets/vendor/slimscroll/jquery.slimscroll.js"></script>
+        <!-- main js -->
+        <script src="../static/assets/libs/js/main-js.js"></script>
+        <!-- chart chartist js -->
+        <script src="../static/assets/vendor/charts/chartist-bundle/chartist.min.js"></script>
+        <!-- sparkline js -->
+        <script src="../static/assets/vendor/charts/sparkline/jquery.sparkline.js"></script>
+        <!-- morris js -->
+        <script src="../static/assets/vendor/charts/morris-bundle/raphael.min.js"></script>
+        <script src="../static/assets/vendor/charts/morris-bundle/morris.js"></script>
+        <!-- chart c3 js -->
+        <script src="../static/assets/vendor/charts/c3charts/c3.min.js"></script>
+        <script src="../static/assets/vendor/charts/c3charts/d3-5.4.0.min.js"></script>
+        <script src="../static/assets/vendor/charts/c3charts/C3chartjs.js"></script>
+        <script src="../static/assets/libs/js/dashboard-ecommerce.js"></script>
+
+
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css" />
+        <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+        
+        <script>
+            $(document).ready(function() {
+                $('#table').DataTable({     
+                  "aLengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                    "iDisplayLength": 10
+                   } 
+                );
+            } );
+        </script>
+    </body>
+</html>

@@ -1,0 +1,346 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Court Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+
+  <style>
+    .custom-text-color 
+    {
+      color: black;
+    }
+  </style>
+
+  <div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+      <div class="page-header">
+        <h3 class="mb-2">Dashboard</h3>
+        <div class="page-breadcrumb">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{{ url_for('home')}}" class="breadcrumb-link">Dashboard</a></li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row float-right">
+    <div class="float-right">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <form id="timeframeForm" action="/" method="GET">
+          <select id="timeframeSelect" name="timeframe" onchange="this.form.submit()">
+            <option value="default" {% if timeframe == 'default' %}selected{% endif %}>Default</option>
+            <option value="today" {% if timeframe == 'today' %}selected{% endif %}>Today</option>
+            <option value="weekly" {% if timeframe == 'weekly' %}selected{% endif %}>Weekly</option>
+            <option value="monthly" {% if timeframe == 'monthly' %}selected{% endif %}>Monthly</option>
+            <option value="yearly" {% if timeframe == 'yearly' %}selected{% endif %}>Yearly</option>
+          </select>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="text-muted">Order</h5>
+          <div class="metric-value d-inline-block">
+            <h2 class="mb-1">{{totalOrder}}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="text-muted">Revenue</h5>
+          <div class="metric-value d-inline-block">
+            <h2 class="mb-1"> RM {{totalPrice}} </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="text-muted">Avg Sales Per Booking</h5>
+          <div class="metric-value d-inline-block">
+            <h2 class="mb-1">RM {{avgPrice}} </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <h4 class="mb-2">Booking</h4>
+  <hr>
+  <div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+      <div class="card-body">
+        <table class="table table-striped table-bordered first">
+          <thead>
+            <tr>
+              <th scope="col">Booking ID</th>
+              <th scope="col">Booking Name</th>
+              <th scope="col">Booking Date</th>
+              <th scope="col">Booking Start Time</th>
+              <th scope="col">Booking End Time</th>
+              <th scope="col">Booking Duration</th>
+              <th scope="col">Booking Price</th>
+            </tr>
+          </thead>
+      
+          <tbody>
+            {% if noBookingMessage %}
+              <tr>
+                  <td colspan="7"> {{ noBookingMessage }} </td>
+              </tr>
+            {% else %}
+              {% for row in recentOrder %}
+                <tr>
+                  <td>{{ row[0] }}</td>
+                  <td>{{ row[1] }}</td>
+                  <td>{{ row[2] }}</td>
+                  <td>{{ row[3] }}</td>
+                  <td>{{ row[4] }}</td>
+                  <td>{{ row[5] }} Min</td>
+                  <td>{{ 'RM %.2f'|format(row[6]) }}</td>
+                </tr>
+              {% endfor %}
+            {% endif %}
+          </tbody>
+              
+          <tr>
+            <td colspan="7"><a href="{{ url_for('booking') }}" class="btn btn-outline-light float-right custom-text-color">View Details</a></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <h4 class="mb-2">Court</h4>
+  <hr>
+  <div class="container">
+    <div class="row">
+      <!-- Left Column -->
+      <div class="col-lg-6">
+        <div class="card">
+          <h4 class="card-header">Number of Court Booking</h4>
+          <div class="card-body">
+            <canvas id="numBooking" width="300" height="200"></canvas>
+          </div>
+          <div class="card-footer">
+            <a href="courtChart" class="btn btn-outline-light float-right custom-text-color">Details</a>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <h4 class="card-header">Court Sales</h4>
+          <div class="card-body">
+            <canvas id="courtSales" width="500" height="300"></canvas>
+          </div>
+          <div class="card-footer">
+            <a href="dailyCourtRentalsReport" class="btn btn-outline-light float-right custom-text-color">Details</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column -->
+      <div class="col-lg-6">
+        <div class="card">
+          <h4 class="card-header">Court</h4>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table no-wrap p-table">
+                <thead class="bg-light">
+                    <tr class="border-0">
+                        <th class="border-0">Court ID/ Name</th>
+                        <th class="border-0">Booking Count</th>
+                        <th class="border-0">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if noCourtDataMessage %}
+                        <tr>
+                            <td colspan="3">{{ noCourtDataMessage }}</td>
+                        </tr>
+                    {% else %}
+                        {% set sortedCourtData = courtBookingCounts|sort(attribute='court_name') %}
+                        {% for row in sortedCourtData %}
+                            <tr>
+                                <td>{{ row['court_name'] }}</td>
+                                <td>{{ row['count'] }}</td>
+                                <td>{{ 'RM %.2f'|format(row['total_price']) }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>            
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="dailyCourtRentalsReport" class="btn btn-outline-light float-right custom-text-color">Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Number Of The Booking
+    var courtNames = {{ court_names | tojson | safe }};
+    var bookingCounts = {{ booking_counts | tojson | safe }};
+
+    // Combine court names and booking counts into an array of objects
+    var data = courtNames.map((name, index) => ({ name: name, count: bookingCounts[index] }));
+
+    // Sort the data array based on court names in ascending order
+    data.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Extract sorted court names and booking counts from the sorted data array
+    var sortedCourtNames = data.map(item => item.name);
+    var sortedBookingCounts = data.map(item => item.count);
+
+    // Create the chart using sorted data
+    var ctx = document.getElementById('numBooking').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: sortedCourtNames,
+            datasets: [{
+                label: 'Number of Bookings per Court',
+                data: sortedBookingCounts,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Number of Bookings'
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 1 // Set step size to 1 for integer values
+                    }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Court ID'
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var dataset = data.datasets[tooltipItem.datasetIndex];
+                        var value = dataset.data[tooltipItem.index];
+                        return "Number of Bookings: " + value + " bookings";
+                    }
+                }
+            }
+        }
+    });
+
+    //Court Sales
+    var courtNames = {{ court_names | tojson }};
+    var totalPrices = {{ total_prices | tojson }};
+
+    // Combine court names and total prices into an array of objects
+    var data = courtNames.map((name, index) => ({ name: name, price: totalPrices[index] }));
+
+    // Sort the data array based on court names in ascending order
+    data.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Extract sorted court names and total prices from the sorted data array
+    var sortedCourtNames = data.map(item => item.name);
+    var sortedTotalPrices = data.map(item => item.price);
+
+    // Function to generate a random RGB color
+    function getRandomColor() {
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+        return "rgba(" + r + "," + g + "," + b + ",0.5)";
+    }
+
+    var backgroundColorArray = [];
+    for (var i = 0; i < sortedCourtNames.length; i++) {
+        backgroundColorArray.push(getRandomColor());
+    }
+
+    // Create the chart using sorted data
+    var ctx1 = document.getElementById("courtSales").getContext("2d");
+    var barChart = new Chart(ctx1, {
+        type: "bar",
+        data: {
+            labels: sortedCourtNames,
+            datasets: [{
+                label: "Total Sales by Court",
+                data: sortedTotalPrices,
+                backgroundColor: backgroundColorArray,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            scales: {
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Court ID'
+                    }
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Total Sales'
+                    },
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var value = tooltipItem.yLabel.toFixed(2); // Format to two decimal places
+                        return "Total Sales: RM " + value;
+                    }
+                }
+            }
+        }
+    });
+
+    // Preserve selected option after form submission
+    document.addEventListener("DOMContentLoaded", function() {
+      var select = document.getElementById("timeframeSelect");
+      var selectedValue = "{{ timeframe }}";
+      for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === selectedValue) {
+          select.selectedIndex = i;
+          break;
+        }
+      }
+    });
+
+    // Automatically submit the form when the selection changes
+    document.getElementById("timeframeForm").addEventListener("change", function() {
+      this.submit();
+    });
+  </script>
+{% endblock %}

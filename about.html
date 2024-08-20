@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+  
+{% block title %}About & Contact Us{% endblock %}
+  
+{% block content %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="page-header">
+            <h3 class="mb-2">About & Contact Us</h3>
+            <div class="page-breadcrumb">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">About</li>
+                        <li class="breadcrumb-item active" aria-current="page">About & Contact Us</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div style="margin-top: 20px;">
+    <h4>About Us</h4>
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Who We Are</p>
+    <p>Welcome to our Badminton Court Management System! We provide an efficient and user-friendly platform for booking and managing badminton court reservations. Our goal is to streamline the process for both players and court managers, ensuring a seamless experience.</p>
+
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Our Mission</p>
+    <p>Our mission is to promote the sport of badminton by making court bookings easy and accessible for everyone. We aim to support both casual players and professional athletes by offering a reliable and convenient service.</p>
+
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Our Vision</p>
+    <p>We envision a world where playing badminton is hassle-free, with quick and easy access to courts. Our platform aspires to be the go-to solution for badminton enthusiasts worldwide.</p>
+</div>
+<br>
+<hr>
+<br>
+<div style="margin-top: 20px;">
+    <h4>Contact Us</h4>
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Name : Veron Then Ming Yao</p>
+
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Email : veronyao319@gmail.com</p>
+
+    <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Phone Number : 012-9507686</p>
+</div>
+
+<div style="margin-top: 20px;">
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+
+{% block title %} Court Rentals Report {% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="page-header">
+            <h3 class="mb-2">Court Rentals Report</h3>
+            <div class="page-breadcrumb">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">Report</li>
+                        <li class="breadcrumb-item active" aria-current="page">Court Rentals Report</li>
+                    </ol>
+                    <br>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-header">Court</h4>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table no-wrap p-table">
+                        <thead class="bg-light">
+                            <tr class="border-0">
+                                <th class="border-0">Court ID/ Name</th>
+                                <th class="border-0">Booking Count</th>
+                                <th class="border-0">Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if noCourtDataMessage %}
+                            <tr>
+                                <td colspan="7"> {{ noCourtDataMessage }} </td>
+                            </tr>
+                            {% else %}
+                            {% for row in courtBookingCounts|sort(attribute='court_name') %}
+                            <tr>
+                                <td>{{ row['c_id'] }}/ {{ row['court_name'] }}</td>
+                                <td>{{ row['count'] }}</td>
+                                <td>{{ 'RM %.2f'|format(row['total_price']) }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+
+                            <tr>
+                                <td></td>
+                                <td>{{totalOrder}}</td>
+                                <td>RM{{totalPrice}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
